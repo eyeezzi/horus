@@ -1,3 +1,11 @@
+// const dotenv = require('dotenv')
+// if (process.env.NODE_ENV !== 'production') {
+// 	const result = dotenv.config()
+// 	if (result.error) {
+// 		throw result.error
+// 	}
+// }
+
 const app = require('express')()
 const uuid = require('uuid/v1')
 
