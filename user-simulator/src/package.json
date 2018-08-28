@@ -1,0 +1,17 @@
+{
+  "name": "user-simulator",
+  "version": "1.0.0",
+  "description": "Uses a cron job to periodically query an API server to simulate a user",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Uzziah Eyee",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "dotenv": "^6.0.0",
+    "node-cron": "^1.2.1"
+  }
+}
