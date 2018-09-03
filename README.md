@@ -13,6 +13,16 @@ Monitoring containerized microservices with a centralized logging architecture.
 		docker-compose up -d
 		
 2. Then log into [Logz.io](logz.io) or your preferred ELK SaaS to view your microservices logs.
+
+
+## Project Documentation
+
+### System Architecture
+
+![](docs/container-architecture.svg)
+
+I wrote an accompanying [Medium article]() detailing the rationale for this architecture.
+
 ## Developer Notes
 
 ### Docker Networking
