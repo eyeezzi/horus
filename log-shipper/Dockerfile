@@ -1,8 +1,10 @@
-# Aparently the onbuild variant is better for customization, sadly, it is errors on build.
-FROM fluent/fluentd:v0.12
+FROM fluent/fluentd:v1.4-2
 
-# We need to install a plugin for logz.io output :(
-RUN apk add --update --virtual .build-deps \
+# Use root account to use apk
+USER root
+
+# We need to install a plugin for logz.io output
+RUN apk add --no-cache --update --virtual .build-deps \
         sudo build-base ruby-dev \
  && sudo gem install \
         fluent-plugin-logzio \
@@ -13,5 +15,8 @@ RUN apk add --update --virtual .build-deps \
 
 # Then copy-over our custom config file
 COPY fluentd.conf /fluentd/etc/
-
 ENV FLUENTD_CONF="fluentd.conf"
+
+USER fluent
+
+# reference: https://hub.docker.com/r/fluent/fluentd
