@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  user-simulator: 
+    build: user-simulator
+    env_file: user-simulator/.env
+    depends_on:
+      - api-server
+      - log-shipper
+    networks:
+      - aparnet
+    
+  api-server:
+    build: api-server
+    env_file: api-server/.env
+    environment:
+      - PORT=3000
+    ports:
+      # so we can send test requests
+      - "3000:3000"
+      # expose debug port
+      - "9229:9229"
+    # override the dockerfile startup command to:
+    # 1) restart on file changes using nodemon
+    # 2) start nodejs in debug mode and allow connections from all IPs
+    command: nodemon --inspect-brk=0.0.0.0 .
+    volumes:
+      - ./api-server/src:/usr/src/app
+    networks:
+      - aparnet
+    depends_on:
+      - log-shipper
+  
+  log-shipper:
+    build: log-shipper
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    env_file: log-shipper/.env
+
+networks:
+  aparnet:
