@@ -12,6 +12,7 @@ A test project for learning microservices observability through: **centralized l
 1. Clone this repo and open the root folder in an IDE like *Visual Studio Code*.
 
 2. For each microservice, rename `example.env` to `.env` and supply the needed secrets.
+    > TODO: Is there a way to eliminate this friction?
 
 3. Start all microservices in *development mode*.
 
@@ -26,6 +27,10 @@ A test project for learning microservices observability through: **centralized l
 4. Attach the IDE's debugger to the desired service. Follow these steps in Visual Studio Code: *shift+cmd+D > Select a debug configuration > F5*.
     > All Visual Studio Code debug configurations are stored in *.vscode/launch.json*. You can modify configs as you see fit.
 
+5. To view tracing information, access the Jaeger UI on http://localhost:16686
+
+    > In development, the tracing backend is a single service (*tracing-backend*) for simplicity, and traces are stored in-memory. However, in production, the tracing backend will setup as multiple services (running on multiple containers), and traces will be persisted in an external store like Elasticsearch.
+
 ### Useful dev commands
 
     # list all running services
@@ -39,7 +44,8 @@ A test project for learning microservices observability through: **centralized l
         up -d --no-deps --build [service-name]
 
     # tail logs from all [or specific] service
-    docker-compose logs -f [service-name]
+    docker-compose -f docker-compose.dev.yml \
+        logs -f [service-name]
 
 ## Production Setup
 
@@ -60,13 +66,13 @@ I wrote an accompanying [article](https://hackernoon.com/monitoring-containerize
 
 - You can update a single service/container while the entire suite is running using the following command
 
-		docker-compose -f docker-compose.dev.yml \
-			up -d --no-deps --build <service_name>
+        docker-compose -f docker-compose.dev.yml \
+            up -d --no-deps --build <service_name>
 
-		docker-compose -f docker-compose.prod.yml \
-			up -d --no-deps --build <service_name>
+        docker-compose -f docker-compose.prod.yml \
+            up -d --no-deps --build <service_name>
 
-	> `--build` recreates the container from its image/dockerfile and `--no-deps` ensures dependent services aren't affected.
+    > `--build` recreates the container from its image/dockerfile and `--no-deps` ensures dependent services aren't affected.
 
 ### Docker Networking
 
@@ -88,6 +94,26 @@ By default each containerized process runs in an isolated network namespace. For
 2. In the log-shipper container, I had to install a logz.io-specific plugin. Can't this step be eliminated since fluentd is capable of connecting to https endpoints without plugins?
 
 3. Use sub-second precision for fluentd timestamps (probably best to use nanoseconds.)
+
+### Environment variables used by Jaeger components
+
+1. [jaeger-client-node](https://github.com/jaegertracing/jaeger-client-node#environment-variables)
+
+        JAEGER_SERVICE_NAME
+        JAEGER_SAMPLER_TYPE
+        JAEGER_SAMPLER_PARAM
+        JAEGER_AGENT_HOST
+        JAEGER_AGENT_PORT
+        JAEGER_ENDPOINT
+
+2. Jaeger Agent
+        TODO
+
+3. Jaeger Collector (and a Storage Backend)
+        TODO
+
+4. Jaeger Query Service and UI
+        TODO
 
 ## Some References
 

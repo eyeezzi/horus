@@ -14,7 +14,16 @@ services:
     build: api-server
     env_file: api-server/.env
     environment:
-      - PORT=3000
+      #todo: change syntax to 'var: val'
+      PORT: 3000
+      JAEGER_SERVICE_NAME: api-server
+      # https://www.jaegertracing.io/docs/1.11/sampling/#client-sampling-configuration
+      JAEGER_SAMPLER_TYPE: const
+      JAEGER_SAMPLER_PARAM: 1
+      # by default, jaeger-client sends traces to an agent on localhost:6832
+      # override and send traces to http://tracing-backend:6832
+      JAEGER_AGENT_HOST: tracing-backend
+      JAEGER_AGENT_PORT: 6832
     ports:
       # so we can send test requests
       - "3000:3000"
@@ -30,6 +39,7 @@ services:
       - aparnet
     depends_on:
       - log-shipper
+      - tracing-backend
   
   log-shipper:
     build: log-shipper
@@ -37,6 +47,22 @@ services:
       - "24224:24224"
       - "24224:24224/udp"
     env_file: log-shipper/.env
+
+  tracing-backend:
+    # sadly, this image is poorly documented on dockerhub - no info on usage or available envars.
+    image: jaegertracing/all-in-one:1.11.0
+    environment:
+      # Storage Backend may be memory|elasticsearch|cassandra|kafka. This image only supports memory.
+      SPAN_STORAGE_TYPE: memory
+      # TODO: explicitly specify Agent port for (accepting traces 6832) (sampling configs 5778)
+      # receiving port of Collector over TChannel protocol
+      COLLECTOR_PORT: 14267
+      # receiving port of Query & UI
+      QUERY_PORT: 16686
+    ports:
+      - "16686:16686"
+    networks:
+      - aparnet
 
 networks:
   aparnet:
