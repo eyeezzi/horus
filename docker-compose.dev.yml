@@ -59,8 +59,12 @@ services:
       COLLECTOR_PORT: 14267
       # receiving port of Query & UI
       QUERY_PORT: 16686
+
+  elasticsearch:
+    image: elasticsearch:5.6-alpine
     ports:
-      - "16686:16686"
+      - "9200:9200" # server listens here
+      - "9300:9300"
     networks:
       - aparnet
 
