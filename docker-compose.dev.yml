@@ -60,6 +60,20 @@ services:
       # receiving port of Query & UI
       QUERY_PORT: 16686
 
+  jaeger-query:
+    build: jaeger-query
+    environment:
+      SPAN_STORAGE_TYPE: elasticsearch
+      ES_SERVER_URLS: http://elasticsearch:9200
+    ports:
+      - "16686:16686" # provides UI
+      - "16687:16687" # healthcheck
+    networks:
+      - aparnet
+    command: wait.sh http://elasticsearch:9200 5 20 "jaeger-query"
+    depends_on:
+      - elasticsearch
+
   elasticsearch:
     image: elasticsearch:5.6-alpine
     ports:
