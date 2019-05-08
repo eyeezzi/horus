@@ -45,6 +45,21 @@ services:
       - "24224:24224/udp"
     env_file: log-shipper/.env
 
+  jaeger-agent:
+    build: jaeger-agent
+    environment:
+      # more options: https://www.jaegertracing.io/docs/1.11/deployment/#all-options-1
+      REPORTER_TYPE: grpc
+      REPORTER_GRPC_HOST_PORT: jaeger-collector:14250
+      PROCESSOR_JAEGER_BINARY_SERVER_HOST_PORT: :6832
+    command: wait.sh http://jaeger-collector:14269 5 20 "jaeger-agent"
+    ports:
+      - "6832:6832" # receiving traces via UDP
+      - "5778:5778" # get sampling strategies
+    networks:
+      - aparnet
+    depends_on:
+      - jaeger-collector
 
   jaeger-collector:
     build: jaeger-collector
