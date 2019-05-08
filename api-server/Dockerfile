@@ -2,14 +2,17 @@ FROM node:10.10.0-alpine
 
 WORKDIR /usr/src/app
 
-# optimization to only rebuild npm modules iff package[-lock].json changes
-COPY src/package*.json ./
+RUN apk add --no-cache bash curl \
+	&& yarn global add nodemon
 
-# TODO: only install nodemon if some arg is set to 'dev'
-RUN npm install -g nodemon
-# For production `RUN npm install --only=production`
-RUN npm install
+
+COPY src/package.json src/yarn.lock ./
+RUN yarn install
 
 COPY src .
 
 CMD ["node", "."]
+
+# ref: https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
+# https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
+# https://runnable.com/blog/9-common-dockerfile-mistakes
