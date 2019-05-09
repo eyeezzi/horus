@@ -1,15 +1,27 @@
 version: '3'
 
 services:
-  user-simulator: 
+  user-simulator:
     build: user-simulator
     env_file: user-simulator/.env
+    environment:
+      NODE_ENV: development
+      JAEGER_SERVICE_NAME: user-simulator
+      JAEGER_AGENT_HOST: jaeger-agent
+      JAEGER_AGENT_PORT: 6832
+      JAEGER_SAMPLER_TYPE: const
+      JAEGER_SAMPLER_PARAM: 1
     depends_on:
       - api-server
       - log-shipper
+    ports:
+      - "9230:9229" # nodejs debugging port
+    command: wait.sh http://api-server:3000/health 5 20 "nodemon --inspect=0.0.0.0 ."
+    volumes:
+      - ./user-simulator/src:/usr/src/app
     networks:
       - aparnet
-    
+
   api-server:
     build: api-server
     env_file: api-server/.env
