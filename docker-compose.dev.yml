@@ -22,22 +22,24 @@ services:
       JAEGER_SAMPLER_PARAM: 1
       # by default, jaeger-client sends traces to an agent on localhost:6832
       # override and send traces to http://tracing-backend:6832
+      JAEGER_AGENT_HOST: jaeger-agent
       JAEGER_AGENT_PORT: 6832
     ports:
-      # so we can send test requests
-      - "3000:3000"
-      # expose debug port
-      - "9229:9229"
+      - "3000:3000" # for receiving api requests
+      - "9229:9229" # nodejs debugging port
     # override the dockerfile startup command to:
     # 1) restart on file changes using nodemon
     # 2) start nodejs in debug mode and allow connections from all IPs
-    command: nodemon --inspect-brk=0.0.0.0 .
+    # our healthcheck hack is to request the current sampling strategy.
+    command: wait.sh http://jaeger-agent:5778?service 5 20 "nodemon --inspect=0.0.0.0 ."
     volumes:
       - ./api-server/src:/usr/src/app
     networks:
       - aparnet
     depends_on:
       - log-shipper
+      - jaeger-agent
+
   log-shipper:
     build: log-shipper
     ports:
