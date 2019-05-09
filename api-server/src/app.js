@@ -7,6 +7,10 @@ const axios = require('axios')
 var initTracer = require('jaeger-client').initTracerFromEnv;
 var tracer = initTracer();
 
+app.use('/health', (req, res) => {
+	res.json(null)
+})
+
 app.use('/api/v1/tokens', (req, res) => {
 	const span = tracer.startSpan('token-request')
 
