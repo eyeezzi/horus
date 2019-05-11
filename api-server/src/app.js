@@ -4,8 +4,9 @@ const axios = require('axios')
 
 // For portability, we initialize tracer from envars instead of local options.
 // See: https://www.npmjs.com/package/jaeger-client#environment-variables
+var opentracing = require('opentracing')
 var initTracer = require('jaeger-client').initTracerFromEnv;
-var tracer = initTracer();
+var tracer = initTracer()
 
 app.use('/health', (req, res) => {
 	res.json(null)
@@ -21,8 +22,8 @@ app.use('/api/v1/tokens', (req, res) => {
 })
 
 app.use('/api/v1/whereami', async (req, res, next) => {
-	const parentSpan = tracer.startSpan('whereami-request')
-	
+	const parentSpan = createContinuationSpan(tracer, req, 'whereami-request')
+
 	try {
 		// get location of IP Address
 		const IP = '23.16.76.104'
@@ -32,8 +33,8 @@ app.use('/api/v1/whereami', async (req, res, next) => {
 		const {lat, lon, city, country} = location.data
 
 		// do some other async task
-		const fakeSpan = tracer.startSpan('fake-fetch', {childOf: parentSpan})
-		const _ = await fakeFetch(100, 0.7)
+		const fakeSpan = tracer.startSpan('get-weather', {childOf: parentSpan})
+		const _ = await fakeFetch(1500, 0.7)
 		fakeSpan.finish()
 
 		// return results
@@ -61,4 +62,23 @@ function fakeFetch(msDelay, successRate) {
 			}
 		}, msDelay)
 	})
+}
+
+function extractContext(tracer, req) {
+	return tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers)
+}
+
+// If the request is already being traced, continue the trace
+// else start a new trace.
+function createContinuationSpan(tracer, req, spanName) {
+	const incomingSpanContext = extractContext(tracer, req)
+	
+	let newSpan = null
+	if (incomingSpanContext == null) {
+		newSpan = tracer.startSpan(spanName)
+	} else {
+		newSpan = tracer.startSpan(spanName, {childOf: incomingSpanContext})
+	}
+
+	return newSpan
 }

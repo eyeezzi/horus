@@ -14,3 +14,15 @@
 
 		# From another terminal on the host machine, test the server
 		curl http://localhost:5000/api/v1/tokens
+
+## Dev Notes
+
+To quickly test a container
+
+    docker build -t <image-name> --no-cache . \
+        && docker run -it -v $(pwd)/src:/usr/src/app <imgage-name> sh
+
+    docker build -t api-server --no-cache . \
+        && docker run -it -v $(pwd)/src:/usr/src/app api-server sh
+
+> The `-v` flag maps host absolute path to container absolute path.
