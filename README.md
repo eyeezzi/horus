@@ -74,6 +74,10 @@ I wrote an accompanying [article](https://hackernoon.com/monitoring-containerize
 
     > `--build` recreates the container from its image/dockerfile and `--no-deps` ensures dependent services aren't affected.
 
+- Some docker images on dockerhub don't list the dockerfile, so to figure out some information like which ports are exposed by default, you can run `docker history <image>`.
+
+- TODO: research **jaeger-operator**
+
 ### Docker Networking
 
 By default each containerized process runs in an isolated network namespace. For inter-container communication, place them in the same network namespace...as seen in *docker-compose.yml*.
