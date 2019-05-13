@@ -5,16 +5,28 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Attach to api-server container",
 			"type": "node",
 			"request": "attach",
+			"name": "Attach to user-simulator container",
+			"address": "localhost",
+			"port": 9230,
+			"protocol": "inspector",
+			"localRoot": "${workspaceFolder}/user-simulator/src",
+			"remoteRoot": "/usr/src/app",
+			"restart": true
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to api-server container",
 			// should match the exposed debug address specified in docker-compose
 			"address": "localhost",
 			"port": 9229,
 			"protocol": "inspector",
 			// you typically copy the src folder into a location in docker...specify this mapping.
 			"localRoot": "${workspaceFolder}/api-server/src",
-			"remoteRoot": "/usr/src/app"
+			"remoteRoot": "/usr/src/app",
+			"restart": true
 		}
 	]
 }
