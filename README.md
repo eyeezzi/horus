@@ -88,7 +88,7 @@ By default each containerized process runs in an isolated network namespace. For
 
 ### References
 
-https://medium.com/lucjuggery/docker-in-development-with-nodemon-d500366e74df
-https://blog.risingstack.com/how-to-debug-a-node-js-app-in-a-docker-container/
-https://codefresh.io/docker-tutorial/debug_node_in_docker/
-https://code.visualstudio.com/docs/editor/debugging
+- https://medium.com/lucjuggery/docker-in-development-with-nodemon-d500366e74df
+- https://blog.risingstack.com/how-to-debug-a-node-js-app-in-a-docker-container/
+- https://codefresh.io/docker-tutorial/debug_node_in_docker/
+- https://code.visualstudio.com/docs/editor/debugging
