@@ -10,8 +10,10 @@
   "author": "Uzziah Eyee",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "dotenv": "^6.0.0",
     "express": "^4.16.3",
+    "jaeger-client": "^3.14.4",
     "uuid": "^3.3.2"
   }
 }

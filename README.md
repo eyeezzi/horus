@@ -1,43 +1,94 @@
 # Horus
 
-Monitoring containerized microservices with a centralized logging architecture.
+A project for learning about microservices observability. 
 
-## Dependencies
+* Centralized Logging
+* Distributed Tracing
+
+## Development Requirements
 
 - Docker Compose v1.23.2
+- OSX or GNU/Linux
 
-## Setup
+## Development Setup
 
-1. Signup with an ELK SaaS provider like [Logz.io](logz.io) to obtain an authentication token. Then for each microservice, rename `example.env` to `.env` and supply the needed secrets.
+1. Clone this repo and open the root folder in an IDE like *Visual Studio Code*.
 
-2. Run the following commands.
+2. For each microservice, rename `example.env` to `.env` and supply the needed secrets.
+    > TODO: Eliminate this friction.
 
-		docker-compose build --pull
-		docker-compose up -d --force-recreate
-		
-3. Then log into your ELK SaaS and view your microservices logs.
+3. Start all microservices in *development mode*.
 
-## Project Documentation
+        docker-compose -f docker-compose.dev.yml \
+            up -d --build
 
-### System Architecture
+    > In Development Mode
+    >
+    > - You can attach a remote debugger to a running service Docker for seemless debugging like placing breakpoints and watching variables.
+    > - Changes to source files will automatically restart the corresponding docker service.
+
+4. Optionally, attach the IDE's debugger to a service as follows in Visual Studio Code: *shift+cmd+D > Select a debug configuration > F5*.
+    > All vscode debug configurations are stored in *.vscode/launch.json*. You can modify configs as you see fit.
+
+5. Visit http://localhost:16686 to view traces.
+
+### Useful dev commands
+
+    # list all running services
+    docker-compose -f docker-compose.dev.yml ps
+
+    # stop all services
+    docker-compose -f docker-compose.dev.yml down
+
+    # restart all [or specific] service
+    docker-compose -f docker-compose.dev.yml \
+        up -d --no-deps --build [service-name]
+
+    # tail logs from all [or specific] service
+    docker-compose -f docker-compose.dev.yml \
+        logs -f [service-name]
+        
+    # see how an image was built
+    docker history <image-name>
+
+## Project Architecture
+
+### Logging Infrastructure
 
 ![](docs/container-architecture.svg)
 
-I wrote an accompanying [article](https://hackernoon.com/monitoring-containerized-microservices-with-a-centralized-logging-architecture-ba6771c1971a) explaining this architecture.
+Read this [article](https://hackernoon.com/monitoring-containerized-microservices-with-a-centralized-logging-architecture-ba6771c1971a) for more details.
 
-## Notes
+### Tracing Infrastructure
 
-### Docker Networking
+![Tracing Backend Architecture](docs/distributed-tracing/tracing-backend.svg)
 
-By default each containerized process runs in an isolated network namespace. For inter-container communication, place them in the same network namespace...as seen in *docker-compose.yml*.
+Read this [article](#todo) for more details.
+
+## Miscellaneous Notes
+
+### TODO (Improvement Considerations)
+
+- Research **jaeger-operator**
+
+- Name Duplication: The value of the `API_SERVER_ADDRESS` variable in *user-simulator/.env* depends on the service name `api-server` specified in *docker-compose.yml*. If we rename the service, we must also change the variable. Is there a way to make this DRY?
+
+- In the log-shipper container, I had to install a logz.io-specific plugin. Can't this step be eliminated since fluentd is capable of connecting to https endpoints without plugins?
+
+- Use sub-second precision for fluentd timestamps (probably best to use nanoseconds.)
 
 ### Best practices
 
 1. You can pass secrets for a microservice using the `env_file` attribute in *docker-compose.yml*.
 2. Microservices can communicate using their service names if they are in the same docker network.
 
-### Improvement Considerations
+### Docker Networking
 
-1. **Name Duplication:** The value of the `API_SERVER_ADDRESS` variable in *user-simulator/.env* depends on the service name `api-server` specified in *docker-compose.yml*. If we rename the service, we must also change the variable. Is there a way to make this DRY?
+By default each containerized process runs in an isolated network namespace. For inter-container communication, place them in the same network namespace.
 
-2. In the log-shipper container, I had to install a logz.io-specific plugin. Can't this step be eliminated since fluentd is capable of connecting to https endpoints without plugins?
+### References
+
+- https://medium.com/lucjuggery/docker-in-development-with-nodemon-d500366e74df
+- https://blog.risingstack.com/how-to-debug-a-node-js-app-in-a-docker-container/
+- https://codefresh.io/docker-tutorial/debug_node_in_docker/
+- https://code.visualstudio.com/docs/editor/debugging

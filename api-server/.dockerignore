@@ -1,4 +1,4 @@
 .env
-/node_modules
-npm-debug.log
+node_modules
+yarn-error.log
 .DS_Store

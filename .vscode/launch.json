@@ -1,0 +1,32 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to user-simulator container",
+			"address": "localhost",
+			"port": 9230,
+			"protocol": "inspector",
+			"localRoot": "${workspaceFolder}/user-simulator/src",
+			"remoteRoot": "/usr/src/app",
+			"restart": true
+		},
+		{
+			"type": "node",
+			"request": "attach",
+			"name": "Attach to api-server container",
+			// should match the exposed debug address specified in docker-compose
+			"address": "localhost",
+			"port": 9229,
+			"protocol": "inspector",
+			// you typically copy the src folder into a location in docker...specify this mapping.
+			"localRoot": "${workspaceFolder}/api-server/src",
+			"remoteRoot": "/usr/src/app",
+			"restart": true
+		}
+	]
+}
