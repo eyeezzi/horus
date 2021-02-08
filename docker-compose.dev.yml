@@ -6,6 +6,7 @@ services:
     env_file: user-simulator/.env
     environment:
       NODE_ENV: development
+      API_SERVER_ADDRESS: http://api-server:3000
       JAEGER_SERVICE_NAME: user-simulator
       JAEGER_AGENT_HOST: jaeger-agent
       JAEGER_AGENT_PORT: 6832
@@ -16,9 +17,13 @@ services:
       - log-shipper
     ports:
       - "9230:9229" # nodejs debugging port
-    command: wait.sh http://api-server:3000/health 5 20 "nodemon --inspect=0.0.0.0 ."
+    command: wait.sh http://api-server:3000/health 5 20 "npm run dev"
     volumes:
       - ./user-simulator/src:/usr/src/app
+      # mount the node_modules directory in the built container into the host
+      # using an anonymous volume. This happens before the host src directory
+      # is mounted on the container, and prevents overriding the node_modules dir.
+      - /usr/src/app/node_modules
     networks:
       - aparnet
 
@@ -43,9 +48,10 @@ services:
     # 1) restart on file changes using nodemon
     # 2) start nodejs in debug mode and allow connections from all IPs
     # our healthcheck hack is to request the current sampling strategy.
-    command: wait.sh http://jaeger-agent:5778?service 5 20 "nodemon --inspect=0.0.0.0 ."
+    command: wait.sh http://jaeger-agent:5778?service 5 20 "yarn run dev"
     volumes:
       - ./api-server/src:/usr/src/app
+      - /usr/src/app/node_modules
     networks:
       - aparnet
     depends_on:
