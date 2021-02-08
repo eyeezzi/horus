@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "dev": "nodemon --inspect=0.0.0.0 .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Uzziah Eyee",

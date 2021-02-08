@@ -13,7 +13,7 @@ RUN yarn install
 
 COPY src .
 
-CMD ["node", "."]
+ENTRYPOINT ["yarn", "run", "dev"]
 
 # ref: https://github.com/nodejs/docker-node/blob/master/docs/BestPractices.md
 # https://nodejs.org/en/docs/guides/nodejs-docker-webapp/
