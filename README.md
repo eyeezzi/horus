@@ -23,7 +23,7 @@ A project for learning about microservices observability.
 
     > In Development Mode
     >
-    > - You can attach a remote debugger to a running service Docker for seemless debugging like placing breakpoints and watching variables.
+    > - You can attach a remote debugger to a running Docker service for seemless debugging like placing breakpoints and watching variables.
     > - Changes to source files will automatically restart the corresponding docker service.
 
 4. Optionally, attach the IDE's debugger to a service as follows in Visual Studio Code: *shift+cmd+D > Select a debug configuration > F5*.
@@ -80,6 +80,11 @@ Read this [article](#todo) for more details.
 
 1. You can pass secrets for a microservice using the `env_file` attribute in *docker-compose.yml*.
 2. Microservices can communicate using their service names if they are in the same docker network.
+3. Do these things to ensure a dockerized application can receive signals: https://hynek.me/articles/docker-signals/. 
+
+    Use exec-form ENTRYPOINT in Dockerfile. If starting your app from a shell or shell script, exec your app in that script so that the shell replaces it's process with your app - instead of spawning your app as a subprocess of the shell.
+
+    `eval "command"` runs the command as a child process which returns to the current process on exit. `exec command` replaces the current process with the new command process, and returns to the grand-parent process on exit. In a shell, `echo $$` gives you the current PID.
 
 ### Docker Networking
 
