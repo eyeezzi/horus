@@ -2,6 +2,11 @@ const app = require('express')()
 const uuid = require('uuid/v1')
 const axios = require('axios')
 
+// Ensure all required environment variables are present
+if (process.env.JAEGER_SERVICE_NAME == undefined || process.env.JAEGER_SERVICE_NAME.trim == "") {
+	throw "Environment variable JAEGER_SERVICE_NAME required but not provided"
+}
+
 // For portability, we initialize tracer from envars instead of local options.
 // See: https://www.npmjs.com/package/jaeger-client#environment-variables
 var opentracing = require('opentracing')
@@ -46,6 +51,11 @@ app.use('/api/v1/whereami', async (req, res, next) => {
 	}
 
 	parentSpan.finish()
+})
+
+app.use('/', (req, res) => {
+	console.log(`Unknown request: ${req.path}`)
+	res.sendStatus(404)
 })
 
 const server = app.listen(process.env.PORT || 3000, () => {
