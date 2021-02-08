@@ -1,6 +1,11 @@
 const cron = require("node-cron")
 const axios = require('axios')
 
+// Ensure all required environment variables are present
+if (process.env.JAEGER_SERVICE_NAME == undefined || process.env.JAEGER_SERVICE_NAME.trim == "") {
+	throw "Environment variable JAEGER_SERVICE_NAME required but not provided"
+}
+
 var opentracing = require('opentracing')
 var initTracer = require('jaeger-client').initTracerFromEnv;
 var tracer = initTracer()
