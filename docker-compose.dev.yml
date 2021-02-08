@@ -1,8 +1,10 @@
-version: '3'
+version: '3.9'
 
 services:
   user-simulator:
     build: user-simulator
+    # Start with the Tini program to forward signals and reap zombies.
+    init: true
     env_file: user-simulator/.env
     environment:
       NODE_ENV: development
@@ -29,6 +31,8 @@ services:
 
   api-server:
     build: api-server
+    # Start with the Tini program to forward signals and reap zombies.
+    init: true
     env_file: api-server/.env
     environment:
       #todo: change syntax to 'var: val'
