@@ -19,8 +19,7 @@ A project for learning about microservices observability.
 
 3. Start all microservices in *development mode*.
 
-        docker-compose -f docker-compose.dev.yml \
-            up -d --build
+        make dev
 
     > In Development Mode
     >
