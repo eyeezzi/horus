@@ -1,19 +1,13 @@
-## Running app in standalone container
+# User Simulator
 
-1. Rename *example.env* to *.env* and supply the `API_SERVER_ADDRESS`. Then run the following commands
+Periodically sends requests to the API Server for tokens and weather.
 
-	> If the API Server is running in another local container with an exposed port, then run this container in the `host` network so it can access the API Server.
+## Dev Setup
 
-		docker build --no-cache -t eyeezzi/horus-user-simulator .
-		docker run -d --env-file=.env eyeezzi/horus-user-simulator
-	
-		# if api server is running on localhost:5000
-		docker run -d --env-file=.env --network=host eyeezzi/horus-user-simulator
-
-2. Verify that this container is generating logs.
-
-		docker ps 
-		docker logs -f <container-name>
+```sh
+# first rename example.env -> .env and provide the needed values
+make dev
+```
 
 ## Notes
 
