@@ -13,13 +13,13 @@ var tracer = initTracer()
 cron.schedule(process.env.CRON_SCHEDULE, async () => {
 	try {
 		console.log(`Requesting token from API Server`)
-		const token = await axios.get(`${process.env.API_SERVER_ADDRESS}/tokens`)
+		const token = await axios.get(`${process.env.API_SERVER_ADDRESS}/api/v1/tokens`)
 		console.log('Received token from server:', token.data)
 
 		const span = tracer.startSpan('whereami-request')
 
 		console.log(`Requesting location info from API Server`)
-		const location = await axios.get(`${process.env.API_SERVER_ADDRESS}/whereami`, {
+		const location = await axios.get(`${process.env.API_SERVER_ADDRESS}/api/v1/whereami`, {
 			headers: getCarrier(span, tracer)
 		})
 		console.log('Received location from server:', location.data)
