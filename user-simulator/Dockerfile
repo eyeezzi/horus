@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 RUN apk add --no-cache bash curl \
 	&& npm install -g nodemon
 
+# Copy the wait script in so we can call it in docker-compose.
 COPY wait.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/wait.sh
 
@@ -15,4 +16,4 @@ RUN npm install
 COPY src .
 
 
-CMD ["node", "."]
+CMD ["npm", "run", "dev"]
