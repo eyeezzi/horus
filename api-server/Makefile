@@ -1,5 +1,11 @@
 CONTAINER_NAME=api-server
-IMAGE_NAME=eyeezzi/horus-api-server
+# TODO: use git commit as tag
+IMAGE_NAME=gcr.io/dapper-ops/uzziah-api-server
+
+# Local Development
+
+.PHONY: dev
+dev: build run
 
 .PHONY: build
 build:
