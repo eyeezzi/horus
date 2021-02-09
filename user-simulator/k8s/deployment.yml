@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-simulator
+  labels: {}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {}
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "false"
+      labels: {}
+    spec:
+      containers:
+      - name: user-simulator
+        image: gcr.io/dapper-ops/uzziah-user-simulator
+        imagePullPolicy: Always
+        command: ["npm", "run", "start"]
+        # are all these jaeger envars necessary
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: API_SERVER_ADDRESS
+          value: "http://api-server.sre.svc.cluster.local:3000"
+        - name: CRON_SCHEDULE
+          value: "*/5 * * * * *"
+        - name: JAEGER_SERVICE_NAME
+          value: "user-simulator"
+        # Send traces to Jaeger agent via UDP
+        - name: JAEGER_AGENT_HOST
+          value: "grafana-tracing-agent.sre.svc.cluster.local"
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        # Send traces directly to the collector. If provided, agent endpoint is ignored.
+        - name: JAEGER_ENDPOINT
+          value: http://grafana-tracing-agent.sre.svc.cluster.local:14268/api/traces
+        - name: JAEGER_SAMPLER_TYPE
+          value: "const"
+        - name: JAEGER_SAMPLER_PARAM
+          value: "1"
+        livenessProbe:
+          exec:
+            command: ["/bin/sh", "-c", "ps -eaf | grep node"]
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["/bin/sh", "-c", "ps -eaf | grep node"]
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 180Mi
+          limits:
+            cpu: 100m
+            memory: 250Mi

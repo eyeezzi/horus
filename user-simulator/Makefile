@@ -1,5 +1,10 @@
 CONTAINER_NAME=user-simulator
-IMAGE_NAME=eyeezzi/horus-user-simulator
+IMAGE_NAME=gcr.io/dapper-ops/uzziah-user-simulator
+
+# Local Development
+
+.PHONY: dev
+dev: build run
 
 .PHONY: build
 build:
@@ -21,5 +26,16 @@ run:
 	--name=${CONTAINER_NAME} \
 	${IMAGE_NAME}
 
-.PHONY: dev
-dev: build run
+# Staging and Production
+
+.PHONY: staging
+staging: build push deploy
+
+.PHONY: push
+push:
+	docker push ${IMAGE_NAME}
+
+.PHONY: deploy
+deploy:
+	kustomize build k8s | kubectl apply -f -
+
