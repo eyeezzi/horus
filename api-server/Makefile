@@ -30,5 +30,16 @@ run:
 	--name=${CONTAINER_NAME} \
 	${IMAGE_NAME}
 
-.PHONY: start
-start: build run
+# Staging and Production
+
+.PHONY: staging
+staging: build push deploy
+
+.PHONY: push
+push:
+	docker push ${IMAGE_NAME}
+
+.PHONY: deploy
+deploy:
+	kustomize build k8s | kubectl apply -f -
+

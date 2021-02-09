@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  labels: {}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {}
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 50%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "false"
+      labels: {}
+    spec:
+      containers:
+      - name: api-server
+        image: gcr.io/dapper-ops/uzziah-api-server
+        imagePullPolicy: Always
+        command: ["npm", "run", "start"]
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: JAEGER_SERVICE_NAME
+          value: "api-server"
+        # Send traces to Jaeger agent via UDP
+        - name: JAEGER_AGENT_HOST
+          value: "grafana-tracing-agent.sre.svc.cluster.local"
+        - name: JAEGER_AGENT_PORT
+          value: "6831"
+        # Send traces directly to the collector. If provided, agent endpoint is ignored.
+        - name: JAEGER_ENDPOINT
+          value: http://grafana-tracing-agent.sre.svc.cluster.local:14268/api/traces
+        - name: JAEGER_SAMPLER_TYPE
+          value: "const"
+        - name: JAEGER_SAMPLER_PARAM
+          value: "1"
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: "/health"
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: "/health"
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 15
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 100m
+            memory: 180Mi
+          limits:
+            cpu: 100m
+            memory: 250Mi
