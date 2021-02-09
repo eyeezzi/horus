@@ -20,13 +20,14 @@ app.use('/health', (req, res) => {
 app.use('/api/v1/tokens', (req, res) => {
 	const span = tracer.startSpan('token-request')
 
-	console.log(`Handling request for token`)
+	mylogger.log(req, "Handling request for toke")
 	res.json({token: uuid()})
 
 	span.finish()
 })
 
 app.use('/api/v1/whereami', async (req, res, next) => {
+	mylogger.log(req, "Handling location request")
 
 	const mainSpan = createContinuationSpan(tracer, req, 'whereami-request')
 
@@ -88,4 +89,18 @@ function createContinuationSpan(tracer, req, spanName) {
 	}
 
 	return newSpan
+}
+
+// mylogger outputs tracing info if context has a trace
+// Log the traceID so it can be queried in Grafana Tempo. context().traceId is binary
+const mylogger = {
+	log: (req, msg) => {
+		// Extract span context from req
+		const spanCtx = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers)
+		let meta = ""
+		if (spanCtx !== null) {
+			meta = `traceID: ${spanCtx.traceIdStr} spanID: ${spanCtx.spanIdStr} isSampled: ${spanCtx.isSampled()}`
+		}
+		console.log(meta, msg)
+	}
 }
