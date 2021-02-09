@@ -74,14 +74,10 @@ function fakeFetch(msDelay, successRate) {
 	})
 }
 
-function extractContext(tracer, req) {
-	return tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers)
-}
-
 // If the request is already being traced, continue the trace
 // else start a new trace.
 function createContinuationSpan(tracer, req, spanName) {
-	const incomingSpanContext = extractContext(tracer, req)
+	const incomingSpanContext = tracer.extract(opentracing.FORMAT_HTTP_HEADERS, req.headers)
 	
 	let newSpan = null
 	if (incomingSpanContext == null) {
