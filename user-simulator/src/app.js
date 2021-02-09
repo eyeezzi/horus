@@ -6,7 +6,12 @@ if (process.env.JAEGER_SERVICE_NAME == undefined || process.env.JAEGER_SERVICE_N
 	throw "Environment variable JAEGER_SERVICE_NAME required but not provided"
 }
 
+if (process.env.CRON_SCHEDULE == undefined || process.env.CRON_SCHEDULE.trim == "") {
+	throw "Environment variable CRON_SCHEDULE required but not provided"
+}
+
 var opentracing = require('opentracing')
+// TODO: how to check that initialization worked
 var initTracer = require('jaeger-client').initTracerFromEnv;
 var tracer = initTracer()
 
