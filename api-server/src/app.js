@@ -27,18 +27,19 @@ app.use('/api/v1/tokens', (req, res) => {
 })
 
 app.use('/api/v1/whereami', async (req, res, next) => {
-	const parentSpan = createContinuationSpan(tracer, req, 'whereami-request')
+
+	const mainSpan = createContinuationSpan(tracer, req, 'whereami-request')
 
 	try {
 		// get location of IP Address
 		const IP = '23.16.76.104'
-		const locSpan = tracer.startSpan('get-location', {childOf: parentSpan})
+		const locSpan = tracer.startSpan('get-location', {childOf: mainSpan})
 		const location = await axios.get(`http://ip-api.com/json/${IP}`)
 		locSpan.finish()
 		const {lat, lon, city, country} = location.data
 
 		// do some other async task
-		const fakeSpan = tracer.startSpan('get-weather', {childOf: parentSpan})
+		const fakeSpan = tracer.startSpan('get-weather', {childOf: mainSpan})
 		const _ = await fakeFetch(1500, 0.7)
 		fakeSpan.finish()
 
@@ -46,11 +47,11 @@ app.use('/api/v1/whereami', async (req, res, next) => {
 		const data = {lat: lat, lon: lon, city: city, country: country}
 		res.json(data)
 	} catch(err) {
-		parentSpan.setTag('ERROR', err)
+		mainSpan.setTag('ERROR', err)
 		next(err)
 	}
 
-	parentSpan.finish()
+	mainSpan.finish()
 })
 
 app.use('/', (req, res) => {
